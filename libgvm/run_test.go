@@ -9,7 +9,7 @@ import (
 type gotoImpl struct{}
 
 func (g gotoImpl) Exec(c *abstraction.ExecCtx) error {
-	c.PC = uint64(g.GetGotoIndexGVMI())
+	c.PC = g.GetGotoIndexGVMI()
 	return nil
 }
 
@@ -41,13 +41,14 @@ func Test__Goto_Exec(t *testing.T) {
 				return
 			}
 
-			if uint64(tt.args.i.(gotoImpl).GetGotoIndexGVMI()) != tt.args.g.PC {
+			if tt.args.i.(gotoImpl).GetGotoIndexGVMI() != tt.args.g.PC {
 				t.Errorf("Exec() get pc = %v, want: %v", tt.args.g.PC, tt.args.i.(gotoImpl).GetGotoIndexGVMI())
 			}
 		})
 	}
 }
 
+//noinspection SpellCheckingInspection
 type donothing struct {
 }
 
@@ -62,7 +63,7 @@ func BenchmarkContinue(b *testing.B) {
 		donothing{},
 	}))
 	var c = &abstraction.ExecCtx{Machine: g, Depth: 0, This: make(abstraction.Locals)}
-	sugar.HandlerError0(pushFrame(c, "main"))
+	sugar.HandlerError0(PushFrame(c, "main"))
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c0 := *c

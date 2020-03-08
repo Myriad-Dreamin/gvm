@@ -43,13 +43,13 @@ func _Continue(g *abstraction.ExecCtx) (err error) {
 func Run(g abstraction.Machine, fn string) (err error) {
 
 	var c = &abstraction.ExecCtx{Machine: g, Depth: 0, This: make(abstraction.Locals)}
-	err = pushFrame(c, fn)
+	err = PushFrame(c, fn)
 	for err == nil {
 		err = _Continue(c)
 
 		if err == OutOfRange {
 			err = popFrame(c)
-		} else if trap, ok := err.(Trap); ok {
+		} else if trap, ok := err.(abstraction.Trap); ok {
 			err = trap.DoTrap(c)
 		}
 	}

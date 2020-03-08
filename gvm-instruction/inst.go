@@ -1,21 +1,14 @@
-package libgvm
+package gvm_instruction
 
 import (
 	"fmt"
+	"github.com/Myriad-Dreamin/gvm/gvm-trap"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/gvm/libgvm"
 )
 
 func incPC(g *abstraction.ExecCtx) error {
 	g.PC++
-	return nil
-}
-
-type Goto struct {
-	Index uint64 `json:"goto"`
-}
-
-func (inst *Goto) Exec(g *abstraction.ExecCtx) error {
-	g.PC = inst.Index
 	return nil
 }
 
@@ -25,7 +18,7 @@ func cond(g *abstraction.ExecCtx, c abstraction.VTok,
 	if err != nil {
 		return err
 	}
-	if v.GetGVMType() != RefBool {
+	if v.GetGVMType() != libgvm.RefBool {
 		return fmt.Errorf("type error: not bool value, is %v", v.GetGVMType())
 	}
 	if v.Unwrap().(bool) {
@@ -36,6 +29,15 @@ func cond(g *abstraction.ExecCtx, c abstraction.VTok,
 		return elseFunc(g)
 	}
 
+	return nil
+}
+
+type Goto struct {
+	Index uint64 `json:"goto"`
+}
+
+func (inst *Goto) Exec(g *abstraction.ExecCtx) error {
+	g.PC = inst.Index
 	return nil
 }
 
@@ -91,12 +93,12 @@ func (G SetLocal) Exec(g *abstraction.ExecCtx) error {
 	return nil
 }
 
-type ConditionSetLocals struct {
+type ConditionSetLocal struct {
 	SetLocal
 	Condition abstraction.VTok `json:"condition"`
 }
 
-func (inst *ConditionSetLocals) Exec(g *abstraction.ExecCtx) error {
+func (inst *ConditionSetLocal) Exec(g *abstraction.ExecCtx) error {
 	return cond(g, inst.Condition, inst.SetLocal.Exec, incPC)
 }
 
@@ -134,7 +136,7 @@ func (G SetFuncReturn) Exec(g *abstraction.ExecCtx) error {
 	if err != nil {
 		return err
 	}
-	g.Parent[FuncReturnName(g, G.Target)] = k
+	g.Parent[libgvm.FuncReturnName(g, G.Target)] = k
 	g.PC++
 	return nil
 }
@@ -148,7 +150,7 @@ func (inst *ConditionSetFuncReturn) Exec(g *abstraction.ExecCtx) error {
 	return cond(g, inst.Condition, inst.SetFuncReturn.Exec, incPC)
 }
 
-type CallFunc = trapCallFunc
+type CallFunc = gvm_trap.CallFunc
 
 type ConditionCallFunc struct {
 	CallFunc

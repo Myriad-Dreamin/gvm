@@ -26,3 +26,7 @@ const (
 	// Slice
 	Length
 )
+
+func IsStandardRefType(t abstraction.RefType) bool {
+	return t > RefUnknown && t < Length
+}

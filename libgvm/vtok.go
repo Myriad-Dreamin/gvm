@@ -1,23 +1,47 @@
 package libgvm
 
 import (
-	"fmt"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
 	"strconv"
 )
 
-type Trap interface {
-	DoTrap(g *abstraction.ExecCtx) error
+type stateVariable interface {
+	GetFieldGVM() string
 }
 
-type trapCallFunc struct {
-	FN    string             `json:"fn"`
-	Left  []string           `json:"left"`
-	Right []abstraction.VTok `json:"right"`
+type LocalStateVariable interface {
+	abstraction.VTok
+	stateVariable
 }
 
-func (c trapCallFunc) Error() string {
-	return fmt.Sprintf("trap calling: %v", c.FN)
+type Constant = abstraction.Ref
+
+type UnaryExpression interface {
+	abstraction.VTok
+	GetSign() SignType
+	GetLeftTok() abstraction.VTok
+}
+
+type BinaryExpression interface {
+	UnaryExpression
+	GetRightTok() abstraction.VTok
+}
+
+type LocalVariable struct {
+	Name string
+	Type abstraction.RefType
+}
+
+func (l LocalVariable) GetGVMTok() abstraction.TokType {
+	return TokLocalVariable
+}
+
+func (l LocalVariable) GetGVMType() abstraction.RefType {
+	return l.Type
+}
+
+func (l LocalVariable) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) {
+	return g.This[l.Name], nil
 }
 
 type FuncParam struct {
@@ -51,30 +75,4 @@ func FuncReturnName(g *abstraction.ExecCtx, k int) string {
 
 func GetReturn(g *abstraction.ExecCtx, k int) abstraction.Ref {
 	return g.Parent[g.This["_gvm_return"+strconv.Itoa(k)].Unwrap().(string)]
-}
-
-func (c trapCallFunc) Exec(g *abstraction.ExecCtx) error {
-	g.PC++
-	return c
-}
-
-func (c trapCallFunc) DoTrap(g *abstraction.ExecCtx) (err error) {
-	var refs = make([]abstraction.Ref, len(c.Right))
-	for l := range c.Right {
-		refs[l], err = c.Right[l].Eval(g)
-		if err != nil {
-			return err
-		}
-	}
-	err = pushFrame(g, c.FN)
-	if err != nil {
-		return err
-	}
-	for l := range c.Right {
-		g.This[strconv.Itoa(l)] = refs[l]
-	}
-	for l := range c.Left {
-		g.This["_gvm_return"+strconv.Itoa(l)] = String(c.Left[l])
-	}
-	return
 }

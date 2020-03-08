@@ -29,7 +29,7 @@ func Test_pushPop(t *testing.T) {
 		FN:       "main",
 		Parent:   nil,
 		This:     abstraction.Locals{"a": Bool(true)}}
-	sugar.HandlerError0(pushFrame(g2Ctx, newFn))
+	sugar.HandlerError0(PushFrame(g2Ctx, newFn))
 
 	type args struct {
 		g  *abstraction.ExecCtx
@@ -56,7 +56,7 @@ func Test_pushPop(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, pc, fn, pt, ts := tt.args.g.Function, tt.args.g.PC, tt.args.g.FN, tt.args.g.Parent, tt.args.g.This
 			d := tt.args.g.Depth
-			if err := pushFrame(tt.args.g, tt.args.fn); err != nil {
+			if err := PushFrame(tt.args.g, tt.args.fn); err != nil {
 				t.Fatal(err)
 			}
 			if !assert.EqualValues(t, d+1, tt.args.g.Depth) {
@@ -107,6 +107,7 @@ func Test_pushPop(t *testing.T) {
 	}
 }
 
+//noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
 func Benchmark_serializeMapSR(b *testing.B) {
 	var mp = map[string]abstraction.Ref{
 		"a":          Bool(true),

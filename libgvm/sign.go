@@ -2,6 +2,7 @@ package libgvm
 
 type SignType = uint16
 
+//noinspection GoUnusedConst
 const (
 	SignUnknown SignType = iota
 
@@ -11,7 +12,7 @@ const (
 	SignGE
 	SignGT
 	SignLNot
-	Sign// Logic And
+	Sign // Logic And
 	SignLAnd
 	SignLOr
 
@@ -21,12 +22,12 @@ const (
 	SignQUO // /
 	SignREM // %
 
-	SignAND     // &
-	SignOR      // |
-	SignXOR     // ^
-	SignSHL     // <<
-	SignSHR     // >>
-	SignAND_NOT // &^
+	SignAND    // &
+	SignOR     // |
+	SignXOR    // ^
+	SignSHL    // <<
+	SignSHR    // >>
+	SignANDNOT // &^
 
 	//Sign//ADD_ASSIGN // +=
 	//Sign//SUB_ASSIGN // -=
@@ -41,10 +42,16 @@ const (
 	//Sign//SHR_ASSIGN     // >>=
 	//Sign//AND_NOT_ASSIGN // &^=
 
+	SignLength
+
 	SignLogicL = SignEQ
 	SignLogicR = SignLOr + 1
 )
 
 func IsLogic(s SignType) bool {
 	return SignLogicL <= s && s < SignLogicR
+}
+
+func IsStandardSignType(t SignType) bool {
+	return t > SignUnknown && t < SignLength
 }

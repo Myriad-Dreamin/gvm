@@ -59,7 +59,7 @@ func deleteFrame(g *abstraction.ExecCtx) error {
 	return nil
 }
 
-func pushFrame(g *abstraction.ExecCtx, fn string) error {
+func PushFrame(g *abstraction.ExecCtx, fn string) error {
 	err := saveFrame(g)
 	if err != nil {
 		return err

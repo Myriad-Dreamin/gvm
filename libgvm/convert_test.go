@@ -120,7 +120,7 @@ func TestGetArithmeticTraits(t *testing.T) {
 		{"int256", args{(*Int256)(big.NewInt(1))}, true, false, 256},
 		{"uint128", args{(*Uint128)(big.NewInt(1))}, true, true, 128},
 		{"uint256", args{(*Uint256)(big.NewInt(1))}, true, true, 256},
-		{"not arithemetic", args{Bool(false)}, false, false, 0},
+		{"not arithmetic", args{Bool(false)}, false, false, 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -320,26 +320,6 @@ func TestToBool(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ToBool() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestExtendType(t *testing.T) {
-	type args struct {
-		l abstraction.Ref
-	}
-	tests := []struct {
-		name string
-		args args
-		want interface{}
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ExtendType(tt.args.l); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ExtendType() = %v, want %v", got, tt.want)
 			}
 		})
 	}

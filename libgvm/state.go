@@ -137,7 +137,7 @@ func saveLocals(g abstraction.Machine, d uint64, locals abstraction.Locals) erro
 	return nil
 }
 
-func serializeMapSR(g abstraction.Machine, mp map[string]abstraction.Ref) (_ []byte, err error) {
+func serializeMapSR(_ abstraction.Machine, mp map[string]abstraction.Ref) (_ []byte, err error) {
 	var b = bytes.NewBuffer(make([]byte, 0, 50))
 	err = binary.Write(b, binary.BigEndian, int32(len(mp)))
 	if err != nil {

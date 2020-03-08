@@ -19,6 +19,7 @@ func NewGVM() (*GVMeX, error) {
 	}, nil
 }
 
+// AddFunction update fn with instructions to the set of function (i.InstSet).
 func (i *GVMeX) AddFunction(fn string, instructions []abstraction.Instruction) error {
 	if i.g.InstSet == nil {
 		i.g.InstSet = make(map[string]abstraction.Function)

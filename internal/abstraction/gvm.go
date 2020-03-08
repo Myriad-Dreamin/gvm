@@ -26,10 +26,3 @@ type ExecCtx struct {
 	FN           string
 	Parent, This Locals
 }
-
-func NewExecCtx() *ExecCtx {
-	return &ExecCtx{
-		Parent: make(Locals),
-		This:   make(Locals),
-	}
-}
