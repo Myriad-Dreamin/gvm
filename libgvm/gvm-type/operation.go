@@ -5,6 +5,15 @@ import (
 	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-builtin"
 )
 
+// arithmeticCal performs arithmetic on two reference
+func arithmeticCal(protoCal func(interface{}, interface{}) interface{}, l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+
+	if l, r, err = TryAlignArithmetic(l, r); err != nil {
+		return nil, err
+	}
+	return UnsafeShrinkType(protoCal(ExtendType(l), ExtendType(r)), l.GetGVMType())
+}
+
 // Add implements arithmetical addition
 func Add(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
 	return arithmeticCal(gvm_builtin.Add, l, r)
@@ -33,6 +42,50 @@ func Quo(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
 // Rem implements arithmetical truncated modulus
 func Rem(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
 	return arithmeticCal(gvm_builtin.Rem, l, r)
+}
+
+func And(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+func Or(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+func Xor(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+func Not(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+func ShiftLeft(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+func ShiftRight(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+func AndNot(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	_, _ = l, r
+	panic("implements me")
+}
+
+// arithmeticCompare performs arithmetical comparison on two reference
+func arithmeticCompare(protoCal func(interface{}, interface{}) bool, l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+
+	if l, r, err = TryAlignArithmetic(l, r); err != nil {
+		return nil, err
+	}
+	return Bool(protoCal(ExtendType(l), ExtendType(r))), nil
 }
 
 // LE implements arithmetical less equal (<=) operation
@@ -77,6 +130,19 @@ func NEQ(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
 	return Bool(!gvm_builtin.Equal(ExtendType(l), ExtendType(r))), nil
 }
 
+// booleanCal performs boolean operation on two reference
+func booleanCal(protoCal func(bool, bool) bool, l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
+	x, err := ToBool(l)
+	if err != nil {
+		return nil, err
+	}
+	y, err := ToBool(r)
+	if err != nil {
+		return nil, err
+	}
+	return Bool(protoCal(x, y)), nil
+}
+
 // LAnd implements logical and
 func LAnd(l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
 	return booleanCal(gvm_builtin.LogicAnd, l, r)
@@ -94,35 +160,4 @@ func LNot(l abstraction.Ref) (abstraction.Ref, error) {
 		return nil, err
 	}
 	return Bool(!x), nil
-}
-
-// arithmeticCal performs arithmetic on two reference
-func arithmeticCal(protoCal func(interface{}, interface{}) interface{}, l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
-
-	if l, r, err = TryAlignArithmetic(l, r); err != nil {
-		return nil, err
-	}
-	return UnsafeShrinkType(protoCal(ExtendType(l), ExtendType(r)), l.GetGVMType())
-}
-
-// arithmeticCompare performs arithmetical comparison on two reference
-func arithmeticCompare(protoCal func(interface{}, interface{}) bool, l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
-
-	if l, r, err = TryAlignArithmetic(l, r); err != nil {
-		return nil, err
-	}
-	return Bool(protoCal(ExtendType(l), ExtendType(r))), nil
-}
-
-// booleanCal performs boolean operation on two reference
-func booleanCal(protoCal func(bool, bool) bool, l abstraction.Ref, r abstraction.Ref) (b abstraction.Ref, err error) {
-	x, err := ToBool(l)
-	if err != nil {
-		return nil, err
-	}
-	y, err := ToBool(r)
-	if err != nil {
-		return nil, err
-	}
-	return Bool(protoCal(x, y)), nil
 }

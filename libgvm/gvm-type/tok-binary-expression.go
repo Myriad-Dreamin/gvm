@@ -8,8 +8,8 @@ import (
 type BinaryExpression struct {
 	Type  abstraction.RefType `json:"type"`
 	Sign  SignType            `json:"sign"`
-	Left  abstraction.VTok            `json:"left"`
-	Right abstraction.VTok            `json:"right"`
+	Left  abstraction.VTok    `json:"left"`
+	Right abstraction.VTok    `json:"right"`
 }
 
 func (b BinaryExpression) GetGVMTok() abstraction.TokType {
@@ -32,6 +32,8 @@ func (b BinaryExpression) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) 
 	switch b.Sign {
 	case SignEQ:
 		return EQ(l, r)
+	case SignNEQ:
+		return NEQ(l, r)
 	case SignLE:
 		return LE(l, r)
 	case SignLT:
@@ -44,18 +46,17 @@ func (b BinaryExpression) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) 
 		return LAnd(l, r)
 	case SignLOr:
 		return LOr(l, r)
-	case SignADD:
+	case SignAdd:
 		return Add(l, r)
-	case SignSUB:
+	case SignSub:
 		return Sub(l, r)
-	case SignMUL:
+	case SignMul:
 		return Mul(l, r)
-	case SignQUO:
+	case SignQuo:
 		return Quo(l, r)
-	case SignREM:
+	case SignRem:
 		return Rem(l, r)
 	default:
 		return nil, fmt.Errorf("unknown sign_type: %v", b.Sign)
 	}
 }
-

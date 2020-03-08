@@ -174,7 +174,7 @@ func funcFib() []gvm.Instruction {
 		gvm_instruction.ConditionCallFunc{
 			CallFunc: gvm_instruction.CallFunc{
 				FN: "fib", Left: []string{"q"}, Right: []gvm.VTok{gvm_type.BinaryExpression{
-					Type: gvm_type.RefInt64, Sign: gvm_type.SignSUB, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
+					Type: gvm_type.RefInt64, Sign: gvm_type.SignSub, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
 				}},
 			},
 			Condition: gvm_type.BinaryExpression{
@@ -183,7 +183,7 @@ func funcFib() []gvm.Instruction {
 		},
 		// r = n + q; return r
 		gvm_instruction.SetFuncReturn{Target: 0, RightExpression: gvm_type.BinaryExpression{
-			Type: gvm_type.RefInt64, Sign: gvm_type.SignADD, Left: gvm_type.LocalVariable{Name: "q"}, Right: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0},
+			Type: gvm_type.RefInt64, Sign: gvm_type.SignAdd, Left: gvm_type.LocalVariable{Name: "q"}, Right: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0},
 		}},
 	}
 }

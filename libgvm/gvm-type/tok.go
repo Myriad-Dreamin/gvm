@@ -8,7 +8,7 @@ import (
 const (
 	TokConstant abstraction.TokType = iota
 	TokStateVariable
-	TokLocalStateVariable
+	//TokLocalStateVariable
 	TokBinaryExpression
 	TokUnaryExpression
 

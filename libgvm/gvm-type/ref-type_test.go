@@ -5,6 +5,7 @@ import (
 	"github.com/Myriad-Dreamin/minimum-lib/sugar"
 	"github.com/stretchr/testify/assert"
 	"math/big"
+	"reflect"
 	"testing"
 )
 
@@ -40,6 +41,54 @@ func TestGoodEDecode(t *testing.T) {
 				}).Decode(sugar.HandlerError(tt.variable.Encode()).([]byte)))
 			if !assert.EqualValues(t, tt.variable, v) {
 				t.Errorf("got = %v, want = %v", v, tt.variable)
+			}
+		})
+	}
+}
+
+func TestCreateRef(t *testing.T) {
+	type args struct {
+		t abstraction.RefType
+		v interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want abstraction.Ref
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CreateRef(tt.args.t, tt.args.v); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CreateRef() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDecodeRef(t *testing.T) {
+	type args struct {
+		t abstraction.RefType
+		r []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    abstraction.Ref
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := DecodeRef(tt.args.t, tt.args.r)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DecodeRef() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DecodeRef() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
