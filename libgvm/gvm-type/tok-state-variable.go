@@ -5,18 +5,17 @@ import (
 )
 
 type StateVariable struct {
-	Type  abstraction.RefType
 	Field string
 }
 
 func (s StateVariable) GetGVMTok() abstraction.TokType {
-	return TokStateVariable
+	panic("implement me")
 }
 
 func (s StateVariable) GetGVMType() abstraction.RefType {
-	return s.Type
+	panic("implement me")
 }
 
 func (s StateVariable) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) {
-	return g.Load(s.Field, s.Type)
+	panic("implement me")
 }
