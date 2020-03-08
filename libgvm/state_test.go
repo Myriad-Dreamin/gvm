@@ -3,6 +3,7 @@ package libgvm
 import (
 	"fmt"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
 	"github.com/Myriad-Dreamin/minimum-lib/sugar"
 	"github.com/stretchr/testify/assert"
 	"strconv"
@@ -28,7 +29,7 @@ func Test_pushPop(t *testing.T) {
 		Depth:    0,
 		FN:       "main",
 		Parent:   nil,
-		This:     abstraction.Locals{"a": Bool(true)}}
+		This:     abstraction.Locals{"a": gvm_type.Bool(true)}}
 	sugar.HandlerError0(PushFrame(g2Ctx, newFn))
 
 	type args struct {
@@ -47,7 +48,7 @@ func Test_pushPop(t *testing.T) {
 			Depth:    0,
 			FN:       "main",
 			Parent:   nil,
-			This:     abstraction.Locals{"a": Bool(true)},
+			This:     abstraction.Locals{"a": gvm_type.Bool(true)},
 		}, fn: newFn}, f: sugar.HandlerError(g.GetFunction(newFn)).(abstraction.Function)},
 		{name: "pushPopWithDepth0", args: args{g: g2Ctx, fn: newFn2},
 			f: sugar.HandlerError(g.GetFunction(newFn2)).(abstraction.Function)},
@@ -110,10 +111,10 @@ func Test_pushPop(t *testing.T) {
 //noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
 func Benchmark_serializeMapSR(b *testing.B) {
 	var mp = map[string]abstraction.Ref{
-		"a":          Bool(true),
-		"bbbb":       Bool(true),
-		"ccccccc":    Bool(true),
-		"dddddddddd": Bool(true),
+		"a":          gvm_type.Bool(true),
+		"bbbb":       gvm_type.Bool(true),
+		"ccccccc":    gvm_type.Bool(true),
+		"dddddddddd": gvm_type.Bool(true),
 	}
 	g := sugar.HandlerError(NewGVM()).(*GVMeX)
 	b.ResetTimer()
@@ -123,7 +124,7 @@ func Benchmark_serializeMapSR(b *testing.B) {
 }
 func Benchmark_deserializeMapSR(b *testing.B) {
 	var mp = map[string]abstraction.Ref{
-		"a": Bool(true),
+		"a": gvm_type.Bool(true),
 	}
 	g := sugar.HandlerError(NewGVM()).(*GVMeX)
 	sugar.HandlerError0(saveLocals(g, 0, mp))
@@ -135,8 +136,8 @@ func Benchmark_deserializeMapSR(b *testing.B) {
 
 func Test_serializeMapSR(t *testing.T) {
 	var mp = map[string]abstraction.Ref{
-		"a": Bool(true),
-		"b": String("123132124"),
+		"a": gvm_type.Bool(true),
+		"b": gvm_type.String("123132124"),
 	}
 
 	g := sugar.HandlerError(NewGVM()).(*GVMeX)
@@ -150,8 +151,8 @@ func Test_serializeMapSR(t *testing.T) {
 	fmt.Println(mp2)
 
 	mp = map[string]abstraction.Ref{
-		"a": Bool(true),
-		"b": Bool(true),
+		"a": gvm_type.Bool(true),
+		"b": gvm_type.Bool(true),
 	}
 
 	sugar.HandlerError0(saveLocals(g, 0, mp))

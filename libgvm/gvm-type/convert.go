@@ -1,4 +1,4 @@
-package libgvm
+package gvm_type
 
 import (
 	"fmt"
@@ -94,7 +94,7 @@ func TryAlignArithmetic(l abstraction.Ref, r abstraction.Ref) (_ abstraction.Ref
 		}
 
 	} else {
-		return nil, nil, ConvertError(l, r)
+		return nil, nil, convertError(l, r)
 	}
 
 	return l, r, nil
@@ -238,7 +238,7 @@ func ExtendBit(r abstraction.Ref, bitCount int) (abstraction.Ref, error) {
 	case RefInt256, RefInt128:
 		return (*Int256)(r.Unwrap().(*big.Int)), nil
 	}
-	return nil, InvalidTypeError(r)
+	return nil, invalidTypeError(r)
 }
 
 // TryConvertUnsigned converts a number type to an unsigned number type.
@@ -249,27 +249,27 @@ func TryConvertUnsigned(k abstraction.Ref) (abstraction.Ref, error) {
 		return k, nil
 	case RefInt8:
 		if k.Unwrap().(int8) < 0 {
-			return nil, ConvertUnsignedError(k)
+			return nil, convertUnsignedError(k)
 		}
 		return Uint8(k.Unwrap().(int8)), nil
 	case RefInt16:
 		if k.Unwrap().(int16) < 0 {
-			return nil, ConvertUnsignedError(k)
+			return nil, convertUnsignedError(k)
 		}
 		return Uint16(k.Unwrap().(int16)), nil
 	case RefInt32:
 		if k.Unwrap().(int32) < 0 {
-			return nil, ConvertUnsignedError(k)
+			return nil, convertUnsignedError(k)
 		}
 		return Uint32(k.Unwrap().(int32)), nil
 	case RefInt64:
 		if k.Unwrap().(int64) < 0 {
-			return nil, ConvertUnsignedError(k)
+			return nil, convertUnsignedError(k)
 		}
 		return Uint64(k.Unwrap().(int64)), nil
 	case RefInt128, RefInt256:
 		if k.Unwrap().(*big.Int).Sign() < 0 {
-			return nil, ConvertUnsignedError(k)
+			return nil, convertUnsignedError(k)
 		}
 		if k.GetGVMType() == RefInt128 {
 			return (*Uint128)(k.Unwrap().(*big.Int)), nil
@@ -277,7 +277,7 @@ func TryConvertUnsigned(k abstraction.Ref) (abstraction.Ref, error) {
 			return (*Uint256)(k.Unwrap().(*big.Int)), nil
 		}
 	}
-	return nil, InvalidTypeError(k)
+	return nil, invalidTypeError(k)
 }
 
 // TryConvertSigned converts a number type to an signed number type.
@@ -303,5 +303,5 @@ func TryConvertSigned(k abstraction.Ref) (abstraction.Ref, error) {
 			return (*Int256)(k.Unwrap().(*big.Int)), nil
 		}
 	}
-	return nil, InvalidTypeError(k)
+	return nil, invalidTypeError(k)
 }

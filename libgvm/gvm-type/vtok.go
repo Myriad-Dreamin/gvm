@@ -1,4 +1,4 @@
-package libgvm
+package gvm_type
 
 import (
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
@@ -20,11 +20,6 @@ type UnaryExpression interface {
 	abstraction.VTok
 	GetSign() SignType
 	GetLeftTok() abstraction.VTok
-}
-
-type BinaryExpression interface {
-	UnaryExpression
-	GetRightTok() abstraction.VTok
 }
 
 type LocalVariable struct {

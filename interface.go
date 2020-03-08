@@ -23,5 +23,6 @@ func NewGVM() (*GVMeX, error) {
 }
 
 func Wrap(g Machine) *GVM {
+
 	return &GVM{Machine: g}
 }

@@ -1,6 +1,9 @@
 package libgvm
 
-import "github.com/Myriad-Dreamin/gvm/internal/abstraction"
+import (
+	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
+)
 
 type impl = GVM
 type GVMeX struct {
@@ -25,6 +28,6 @@ func (i *GVMeX) AddFunction(fn string, instructions []abstraction.Instruction) e
 		i.g.InstSet = make(map[string]abstraction.Function)
 	}
 
-	i.g.InstSet[fn] = FunctionImpl(instructions)
+	i.g.InstSet[fn] = gvm_type.FunctionImpl(instructions)
 	return nil
 }

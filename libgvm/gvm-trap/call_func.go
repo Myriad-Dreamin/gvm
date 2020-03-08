@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
 	"github.com/Myriad-Dreamin/gvm/libgvm"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
 	"strconv"
 )
 
@@ -38,7 +39,7 @@ func (c CallFunc) DoTrap(g *abstraction.ExecCtx) (err error) {
 		g.This[strconv.Itoa(l)] = refs[l]
 	}
 	for l := range c.Left {
-		g.This["_gvm_return"+strconv.Itoa(l)] = libgvm.String(c.Left[l])
+		g.This["_gvm_return"+strconv.Itoa(l)] = gvm_type.String(c.Left[l])
 	}
 	return
 }

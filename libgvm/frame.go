@@ -1,6 +1,8 @@
 package libgvm
 
-import "github.com/Myriad-Dreamin/gvm/internal/abstraction"
+import (
+	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+)
 
 func saveFrame(g *abstraction.ExecCtx) error {
 	err := setPC(g, g.Depth, g.PC)

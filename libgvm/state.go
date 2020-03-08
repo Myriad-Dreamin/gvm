@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
 	"strconv"
 )
 
@@ -21,7 +22,7 @@ const (
 
 // GetPC return the value of PC at depth `dep`
 func GetPC(g abstraction.Machine, dep uint64) (uint64, error) {
-	r, err := g.Load(fPCPrefix+formatUintSuffix(dep), RefUint64)
+	r, err := g.Load(fPCPrefix+formatUintSuffix(dep), gvm_type.RefUint64)
 	if err != nil {
 		return 0, err
 	}
@@ -30,7 +31,7 @@ func GetPC(g abstraction.Machine, dep uint64) (uint64, error) {
 
 // GetCurrentPC return the value of current PC
 func GetCurrentPC(g abstraction.Machine) (uint64, error) {
-	r, err := g.Load(fCurrentPC, RefUint64)
+	r, err := g.Load(fCurrentPC, gvm_type.RefUint64)
 	if err != nil {
 		return 0, err
 	}
@@ -39,7 +40,7 @@ func GetCurrentPC(g abstraction.Machine) (uint64, error) {
 
 // GetFN return the function name at depth `dep`
 func GetFN(g abstraction.Machine, dep uint64) (string, error) {
-	r, err := g.Load(fFNPrefix+formatUintSuffix(dep), RefString)
+	r, err := g.Load(fFNPrefix+formatUintSuffix(dep), gvm_type.RefString)
 	if err != nil {
 		return "", err
 	}
@@ -48,7 +49,7 @@ func GetFN(g abstraction.Machine, dep uint64) (string, error) {
 
 // GetCurrentFN return the value of current function name
 func GetCurrentFN(g abstraction.Machine) (string, error) {
-	r, err := g.Load(fCurrentFN, RefString)
+	r, err := g.Load(fCurrentFN, gvm_type.RefString)
 	if err != nil {
 		return "", err
 	}
@@ -57,18 +58,18 @@ func GetCurrentFN(g abstraction.Machine) (string, error) {
 
 // GetCurrentDepth return the value of current depth
 func GetCurrentDepth(g abstraction.Machine) (uint64, error) {
-	r, err := g.Load(fDepth, RefUint64)
+	r, err := g.Load(fDepth, gvm_type.RefUint64)
 	if err != nil {
 		return 0, err
 	}
-	if r == Undefined {
+	if r == gvm_type.Undefined {
 		return 0, nil
 	}
 	return r.Unwrap().(uint64), nil
 }
 
 func setPC(g abstraction.Machine, dep, pc uint64) error {
-	return g.Save(fPCPrefix+formatUintSuffix(dep), Uint64(pc))
+	return g.Save(fPCPrefix+formatUintSuffix(dep), gvm_type.Uint64(pc))
 }
 
 func deletePC(g abstraction.Machine, dep uint64) error {
@@ -76,11 +77,11 @@ func deletePC(g abstraction.Machine, dep uint64) error {
 }
 
 func setCurrentPC(g abstraction.Machine, pc uint64) error {
-	return g.Save(fCurrentPC, Uint64(pc))
+	return g.Save(fCurrentPC, gvm_type.Uint64(pc))
 }
 
 func setFN(g abstraction.Machine, dep uint64, fn string) error {
-	return g.Save(fFNPrefix+formatUintSuffix(dep), String(fn))
+	return g.Save(fFNPrefix+formatUintSuffix(dep), gvm_type.String(fn))
 }
 
 func deleteFN(g abstraction.Machine, dep uint64) error {
@@ -88,11 +89,11 @@ func deleteFN(g abstraction.Machine, dep uint64) error {
 }
 
 func setCurrentFN(g abstraction.Machine, fn string) error {
-	return g.Save(fCurrentFN, String(fn))
+	return g.Save(fCurrentFN, gvm_type.String(fn))
 }
 
 func setCurrentDepth(g abstraction.Machine, dep uint64) error {
-	return g.Save(fDepth, Uint64(dep))
+	return g.Save(fDepth, gvm_type.Uint64(dep))
 }
 
 func setCurrentState(g *abstraction.ExecCtx) error {
@@ -113,7 +114,7 @@ func setCurrentState(g *abstraction.ExecCtx) error {
 
 func loadLocals(g abstraction.Machine, d uint64) (abstraction.Locals, error) {
 
-	r, err := g.Load("_gvm_locals_"+strconv.FormatUint(d, 16), RefBytes)
+	r, err := g.Load("_gvm_locals_"+strconv.FormatUint(d, 16), gvm_type.RefBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +131,7 @@ func saveLocals(g abstraction.Machine, d uint64, locals abstraction.Locals) erro
 	if err != nil {
 		return err
 	}
-	err = g.Save("_gvm_locals_"+strconv.FormatUint(d, 16), g.CreateRef(RefBytes, b))
+	err = g.Save("_gvm_locals_"+strconv.FormatUint(d, 16), g.CreateRef(gvm_type.RefBytes, b))
 	if err != nil {
 		return err
 	}

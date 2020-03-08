@@ -1,4 +1,4 @@
-package libgvm
+package gvm_type
 
 import (
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"

@@ -2,9 +2,9 @@ package gvm_instruction
 
 import (
 	"fmt"
-	"github.com/Myriad-Dreamin/gvm/gvm-trap"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
-	"github.com/Myriad-Dreamin/gvm/libgvm"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-trap"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
 )
 
 func incPC(g *abstraction.ExecCtx) error {
@@ -18,7 +18,7 @@ func cond(g *abstraction.ExecCtx, c abstraction.VTok,
 	if err != nil {
 		return err
 	}
-	if v.GetGVMType() != libgvm.RefBool {
+	if v.GetGVMType() != gvm_type.RefBool {
 		return fmt.Errorf("type error: not bool value, is %v", v.GetGVMType())
 	}
 	if v.Unwrap().(bool) {
@@ -136,7 +136,7 @@ func (G SetFuncReturn) Exec(g *abstraction.ExecCtx) error {
 	if err != nil {
 		return err
 	}
-	g.Parent[libgvm.FuncReturnName(g, G.Target)] = k
+	g.Parent[gvm_type.FuncReturnName(g, G.Target)] = k
 	g.PC++
 	return nil
 }

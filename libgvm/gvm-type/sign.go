@@ -1,4 +1,4 @@
-package libgvm
+package gvm_type
 
 type SignType = uint16
 

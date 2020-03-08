@@ -1,8 +1,8 @@
-package libgvm
+package gvm_type
 
 import (
-	"github.com/Myriad-Dreamin/gvm/gvm-builtin"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-builtin"
 )
 
 // Add implements arithmetical addition

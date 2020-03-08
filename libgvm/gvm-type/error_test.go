@@ -1,4 +1,4 @@
-package libgvm
+package gvm_type
 
 import (
 	"fmt"
@@ -36,8 +36,8 @@ func TestConvertError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := ConvertError(tt.args.l, tt.args.r); err == nil || err.Error() != tt.err.Error() {
-				t.Errorf("ConvertError() error = %v, wantErr %v", err, tt.err)
+			if err := convertError(tt.args.l, tt.args.r); err == nil || err.Error() != tt.err.Error() {
+				t.Errorf("convertError() error = %v, wantErr %v", err, tt.err)
 			}
 		})
 	}

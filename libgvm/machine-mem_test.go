@@ -3,9 +3,10 @@ package libgvm_test
 import (
 	"fmt"
 	"github.com/Myriad-Dreamin/gvm"
-	"github.com/Myriad-Dreamin/gvm/gvm-instruction"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
 	"github.com/Myriad-Dreamin/gvm/libgvm"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-instruction"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
 	"github.com/Myriad-Dreamin/minimum-lib/sugar"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -33,86 +34,32 @@ func runMemoryGVM(callback func(g *libgvm.GVMeX), instructions []abstraction.Ins
 	callback(g)
 }
 
-type BinaryExpression struct {
-	Type  abstraction.RefType `json:"type"`
-	Sign  libgvm.SignType     `json:"sign"`
-	Left  gvm.VTok            `json:"left"`
-	Right gvm.VTok            `json:"right"`
-}
-
-func (b BinaryExpression) GetGVMTok() abstraction.TokType {
-	return libgvm.TokBinaryExpression
-}
-
-func (b BinaryExpression) GetGVMType() abstraction.RefType {
-	return b.Type
-}
-
-func (b BinaryExpression) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) {
-	l, err := b.Left.Eval(g)
-	if err != nil {
-		return nil, err
-	}
-	r, err := b.Right.Eval(g)
-	if err != nil {
-		return nil, err
-	}
-	switch b.Sign {
-	case libgvm.SignEQ:
-		return libgvm.EQ(l, r)
-	case libgvm.SignLE:
-		return libgvm.LE(l, r)
-	case libgvm.SignLT:
-		return libgvm.LT(l, r)
-	case libgvm.SignGE:
-		return libgvm.GE(l, r)
-	case libgvm.SignGT:
-		return libgvm.GT(l, r)
-	case libgvm.SignLAnd:
-		return libgvm.LAnd(l, r)
-	case libgvm.SignLOr:
-		return libgvm.LOr(l, r)
-	case libgvm.SignADD:
-		return libgvm.Add(l, r)
-	case libgvm.SignSUB:
-		return libgvm.Sub(l, r)
-	case libgvm.SignMUL:
-		return libgvm.Mul(l, r)
-	case libgvm.SignQUO:
-		return libgvm.Quo(l, r)
-	case libgvm.SignREM:
-		return libgvm.Rem(l, r)
-	default:
-		return nil, fmt.Errorf("unknown sign_type: %v", b.Sign)
-	}
-}
-
 func setStateTestCase() []abstraction.Instruction {
 	return []abstraction.Instruction{
 		gvm_instruction.SetState{
 			Target:          "a",
-			RightExpression: libgvm.Bool(true),
+			RightExpression: gvm_type.Bool(true),
 		},
 		gvm_instruction.SetState{
 			Target:          "b",
-			RightExpression: libgvm.Bool(false),
+			RightExpression: gvm_type.Bool(false),
 		},
 		gvm_instruction.SetState{
 			Target: "c",
-			RightExpression: BinaryExpression{
-				Type:  libgvm.RefBool,
-				Sign:  libgvm.SignLAnd,
-				Left:  libgvm.Bool(false),
-				Right: libgvm.Bool(true),
+			RightExpression: gvm_type.BinaryExpression{
+				Type:  gvm_type.RefBool,
+				Sign:  gvm_type.SignLAnd,
+				Left:  gvm_type.Bool(false),
+				Right: gvm_type.Bool(true),
 			},
 		},
 		gvm_instruction.SetState{
 			Target: "d",
-			RightExpression: BinaryExpression{
-				Type:  libgvm.RefBool,
-				Sign:  libgvm.SignLOr,
-				Left:  libgvm.Bool(false),
-				Right: libgvm.Bool(true),
+			RightExpression: gvm_type.BinaryExpression{
+				Type:  gvm_type.RefBool,
+				Sign:  gvm_type.SignLOr,
+				Left:  gvm_type.Bool(false),
+				Right: gvm_type.Bool(true),
 			},
 		},
 	}
@@ -122,7 +69,7 @@ func funcSetA() []abstraction.Instruction {
 	return []abstraction.Instruction{
 		gvm_instruction.SetState{
 			Target:          "a",
-			RightExpression: libgvm.Bool(true),
+			RightExpression: gvm_type.Bool(true),
 		},
 	}
 }
@@ -153,7 +100,7 @@ func BenchmarkPureSetStatus(b *testing.B) {
 	sugar.HandlerError0(g.AddFunction("main", []abstraction.Instruction{
 		gvm_instruction.SetState{
 			Target:          "a",
-			RightExpression: libgvm.Bool(true),
+			RightExpression: gvm_type.Bool(true),
 		},
 	}))
 	b.ResetTimer()
@@ -222,21 +169,21 @@ func funcFib() []gvm.Instruction {
 	// func fib(n int64) (r int64)
 	return []gvm.Instruction{
 		// q := 0
-		gvm_instruction.SetLocal{Target: "q", RightExpression: libgvm.Int64(0)},
+		gvm_instruction.SetLocal{Target: "q", RightExpression: gvm_type.Int64(0)},
 		// if n > 0 { q = fib(n - 1); }
 		gvm_instruction.ConditionCallFunc{
 			CallFunc: gvm_instruction.CallFunc{
-				FN: "fib", Left: []string{"q"}, Right: []gvm.VTok{BinaryExpression{
-					Type: libgvm.RefInt64, Sign: libgvm.SignSUB, Left: libgvm.FuncParam{T: libgvm.RefInt64, K: 0}, Right: libgvm.Int64(1),
+				FN: "fib", Left: []string{"q"}, Right: []gvm.VTok{gvm_type.BinaryExpression{
+					Type: gvm_type.RefInt64, Sign: gvm_type.SignSUB, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
 				}},
 			},
-			Condition: BinaryExpression{
-				Type: libgvm.RefBool, Sign: libgvm.SignGT, Left: libgvm.FuncParam{T: libgvm.RefInt64, K: 0}, Right: libgvm.Int64(0),
+			Condition: gvm_type.BinaryExpression{
+				Type: gvm_type.RefBool, Sign: gvm_type.SignGT, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(0),
 			},
 		},
 		// r = n + q; return r
-		gvm_instruction.SetFuncReturn{Target: 0, RightExpression: BinaryExpression{
-			Type: libgvm.RefInt64, Sign: libgvm.SignADD, Left: libgvm.LocalVariable{Name: "q"}, Right: libgvm.FuncParam{T: libgvm.RefInt64, K: 0},
+		gvm_instruction.SetFuncReturn{Target: 0, RightExpression: gvm_type.BinaryExpression{
+			Type: gvm_type.RefInt64, Sign: gvm_type.SignADD, Left: gvm_type.LocalVariable{Name: "q"}, Right: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0},
 		}},
 	}
 }
@@ -246,7 +193,7 @@ func TestFibonacci(t *testing.T) {
 	runMemoryGVM(func(g *libgvm.GVMeX) {
 		//fmt.Println(g.Machine.(*libgvm.Mem).Context)
 	}, []abstraction.Instruction{
-		gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{libgvm.Int64(3)}},
+		gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{gvm_type.Int64(3)}},
 		doInst{g: func(g *abstraction.ExecCtx) error {
 			fmt.Println("fib(3) =", g.This["res"])
 			g.PC++
@@ -261,7 +208,7 @@ func BenchmarkFibnacci(b *testing.B) {
 		runMemoryGVM(func(g *libgvm.GVMeX) {
 		}, []abstraction.Instruction{
 			gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{
-				libgvm.Int64(3)}},
+				gvm_type.Int64(3)}},
 		})
 	}
 }

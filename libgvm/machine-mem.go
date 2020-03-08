@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
 )
 
 type Mem struct {
@@ -41,7 +42,7 @@ func (g *Mem) Load(field string, t abstraction.RefType) (abstraction.Ref, error)
 		}
 		return r, nil
 	} else {
-		return Undefined, nil
+		return gvm_type.Undefined, nil
 	}
 }
 
