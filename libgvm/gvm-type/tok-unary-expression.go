@@ -1,6 +1,9 @@
 package gvm_type
 
-import "github.com/Myriad-Dreamin/gvm/internal/abstraction"
+import (
+	"fmt"
+	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+)
 
 type UnaryExpression struct {
 	Type abstraction.RefType `json:"type"`
@@ -9,13 +12,22 @@ type UnaryExpression struct {
 }
 
 func (u UnaryExpression) GetGVMTok() abstraction.TokType {
-	panic("implement me")
+	return TokUnaryExpression
 }
 
 func (u UnaryExpression) GetGVMType() abstraction.RefType {
-	panic("implement me")
+	return u.Type
 }
 
 func (u UnaryExpression) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) {
-	panic("implement me")
+	l, err := u.Left.Eval(g)
+	if err != nil {
+		return nil, err
+	}
+	switch u.Sign {
+	case SignLNot:
+		return LNot(l)
+	default:
+		return nil, fmt.Errorf("unknown sign_type: %v", u.Sign)
+	}
 }
