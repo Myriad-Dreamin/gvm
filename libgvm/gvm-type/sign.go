@@ -6,28 +6,29 @@ type SignType = uint16
 const (
 	SignUnknown SignType = iota
 
-	SignEQ
-	SignLE
-	SignLT
-	SignGE
-	SignGT
-	SignLNot
-	Sign // Logic And
-	SignLAnd
-	SignLOr
+	SignEQ   // ==
+	SignNEQ  // !=
+	SignLE   // <=
+	SignLT   // >
+	SignGE   // >=
+	SignGT   // <
+	SignLAnd // &&
+	SignLOr  // ||
+	SignLNot // !
 
-	SignADD // +
-	SignSUB // -
-	SignMUL // *
-	SignQUO // /
-	SignREM // %
+	SignAdd // +
+	SignSub // -
+	SignMul // *
+	SignQuo // /
+	SignRem // %
 
-	SignAND    // &
-	SignOR     // |
-	SignXOR    // ^
+	SignAnd    // &
+	SignOr     // |
+	SignXor    // ^
+	SignNot    // ~
 	SignSHL    // <<
 	SignSHR    // >>
-	SignANDNOT // &^
+	SignAndNot // &^
 
 	//Sign//ADD_ASSIGN // +=
 	//Sign//SUB_ASSIGN // -=
@@ -45,11 +46,25 @@ const (
 	SignLength
 
 	SignLogicL = SignEQ
-	SignLogicR = SignLOr + 1
+	SignLogicR = SignLNot + 1
+
+	SignArithmeticL = SignAdd
+	SignArithmeticR = SignRem + 1
+
+	SignBitwiseOpL = SignAnd
+	SignBitwiseOpR = SignAndNot + 1
 )
 
 func IsLogic(s SignType) bool {
 	return SignLogicL <= s && s < SignLogicR
+}
+
+func IsArithmetic(s SignType) bool {
+	return SignArithmeticL <= s && s < SignArithmeticR
+}
+
+func IsBitwiseOp(s SignType) bool {
+	return SignBitwiseOpL <= s && s < SignBitwiseOpR
 }
 
 func IsStandardSignType(t SignType) bool {
