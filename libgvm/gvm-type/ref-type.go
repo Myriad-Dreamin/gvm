@@ -26,24 +26,41 @@ func CreateRef(t abstraction.RefType, v interface{}) abstraction.Ref {
 		return Int32(v.(int32))
 	case RefInt64:
 		return Int64(v.(int64))
-	case RefUint128:
-		return (*Uint128)(v.(*big.Int))
-	case RefUint256:
-		return (*Uint256)(v.(*big.Int))
-	case RefInt128:
-		return (*Int128)(v.(*big.Int))
-	case RefInt256:
-		return (*Int256)(v.(*big.Int))
 	case RefBool:
 		return Bool(v.(bool))
 	case RefString:
 		return String(v.(string))
-	case RefBytes:
-		return Bytes(v.([]byte))
-	case RefUnknown:
-		return Undefined
+	case RefBytes, RefUint128, RefUint256, RefInt128, RefInt256:
+		if v == nil {
+			switch t {
+			case RefBytes:
+				return Bytes(nil)
+			case RefUint128, RefUint256, RefInt128, RefInt256:
+				panic(runtimeConvertNil(t))
+			}
+		}
+		switch t {
+		case RefBytes:
+			return Bytes(v.([]byte))
+		case RefUint128:
+			return (*Uint128)(v.(*big.Int))
+		case RefUint256:
+			return (*Uint256)(v.(*big.Int))
+		case RefInt128:
+			return (*Int128)(v.(*big.Int))
+		case RefInt256:
+			return (*Int256)(v.(*big.Int))
+		}
 	}
-	panic(fmt.Errorf("unknown reference type: %v", ExplainGVMType(t)))
+	panic(creatingUnknownReferenceType(t))
+}
+
+func runtimeConvertNil(t abstraction.RefType) error {
+	return fmt.Errorf("could not convert nil to type %v", ExplainGVMType(t))
+}
+
+func creatingUnknownReferenceType(t abstraction.RefType) error {
+	return fmt.Errorf("unknown reference type: %v", ExplainGVMType(t))
 }
 
 // CreateRef decodes r to runtime reference, assuming r was encoded in t
@@ -99,11 +116,18 @@ func (u *Unknown) Decode(_ []byte) (abstraction.Ref, error)             { return
 func (u *Unknown) GetGVMTok() abstraction.TokType                       { return TokConstant }
 func (u *Unknown) Eval(_ *abstraction.ExecCtx) (abstraction.Ref, error) { return u, nil }
 
+func encodeBigInt(b *big.Int) ([]byte, error) {
+	if b == nil {
+		return nil, nil
+	}
+	return b.Bytes(), nil
+}
+
 type Uint128 big.Int
 
 func (v *Uint128) GetGVMType() abstraction.RefType { return RefUint128 }
 func (v *Uint128) Unwrap() interface{}             { return (*big.Int)(v) }
-func (v *Uint128) Encode() ([]byte, error)         { return (*big.Int)(v).Bytes(), nil }
+func (v *Uint128) Encode() ([]byte, error)         { return encodeBigInt((*big.Int)(v)) }
 func (v *Uint128) Decode(b []byte) (abstraction.Ref, error) {
 	return (*Uint128)(big.NewInt(0).SetBytes(b)), nil
 }
@@ -114,7 +138,7 @@ type Uint256 big.Int
 
 func (v *Uint256) GetGVMType() abstraction.RefType { return RefUint256 }
 func (v *Uint256) Unwrap() interface{}             { return (*big.Int)(v) }
-func (v *Uint256) Encode() ([]byte, error)         { return (*big.Int)(v).Bytes(), nil }
+func (v *Uint256) Encode() ([]byte, error)         { return encodeBigInt((*big.Int)(v)) }
 func (v *Uint256) Decode(b []byte) (abstraction.Ref, error) {
 	return (*Uint256)(big.NewInt(0).SetBytes(b)), nil
 }
@@ -125,7 +149,7 @@ type Int128 big.Int
 
 func (v *Int128) GetGVMType() abstraction.RefType { return RefInt128 }
 func (v *Int128) Unwrap() interface{}             { return (*big.Int)(v) }
-func (v *Int128) Encode() ([]byte, error)         { return (*big.Int)(v).Bytes(), nil }
+func (v *Int128) Encode() ([]byte, error)         { return encodeBigInt((*big.Int)(v)) }
 func (v *Int128) Decode(b []byte) (abstraction.Ref, error) {
 	return (*Int128)(big.NewInt(0).SetBytes(b)), nil
 }
@@ -136,7 +160,7 @@ type Int256 big.Int
 
 func (v *Int256) GetGVMType() abstraction.RefType { return RefInt256 }
 func (v *Int256) Unwrap() interface{}             { return (*big.Int)(v) }
-func (v *Int256) Encode() ([]byte, error)         { return (*big.Int)(v).Bytes(), nil }
+func (v *Int256) Encode() ([]byte, error)         { return encodeBigInt((*big.Int)(v)) }
 func (v *Int256) Decode(b []byte) (abstraction.Ref, error) {
 	return (*Int256)(big.NewInt(0).SetBytes(b)), nil
 }
