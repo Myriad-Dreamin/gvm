@@ -5,7 +5,6 @@ import (
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
 	"github.com/Myriad-Dreamin/gvm/libgvm"
 	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-type"
-	"strconv"
 )
 
 type CallFunc struct {
@@ -36,10 +35,13 @@ func (c CallFunc) DoTrap(g *abstraction.ExecCtx) (err error) {
 		return err
 	}
 	for l := range c.Right {
-		g.This[strconv.Itoa(l)] = refs[l]
+		gvm_type.AddParam(g, l, refs[l])
 	}
+	g.This["gvm_fp_cnt"] = gvm_type.Uint64(len(c.Right))
+
 	for l := range c.Left {
-		g.This["_gvm_return"+strconv.Itoa(l)] = gvm_type.String(c.Left[l])
+		g.This[gvm_type.FuncReturnName(g, l)] = gvm_type.String(c.Left[l])
 	}
+	g.This["gvm_fr_cnt"] = gvm_type.Uint64(len(c.Left))
 	return
 }
