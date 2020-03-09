@@ -16,5 +16,13 @@ func (l LocalVariable) GetGVMType() abstraction.RefType {
 }
 
 func (l LocalVariable) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) {
-	return g.This[l.Name], nil
+	v, ok := g.This[l.Name]
+	if !ok {
+		v = Undefined
+	}
+
+	if v.GetGVMType() != l.Type {
+		return nil, expressionTypeError(l.Type, v.GetGVMType())
+	}
+	return v, nil
 }
