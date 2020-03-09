@@ -29,11 +29,3 @@ func GetParam(g *abstraction.ExecCtx, k int) abstraction.Ref {
 func FuncParamName(k int) string {
 	return strconv.Itoa(k)
 }
-
-func FuncReturnName(g *abstraction.ExecCtx, k int) string {
-	return g.This["_gvm_return"+strconv.Itoa(k)].Unwrap().(string)
-}
-
-func GetReturn(g *abstraction.ExecCtx, k int) abstraction.Ref {
-	return g.Parent[FuncReturnName(g, k)]
-}
