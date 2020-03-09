@@ -136,7 +136,11 @@ func (G SetFuncReturn) Exec(g *abstraction.ExecCtx) error {
 	if err != nil {
 		return err
 	}
-	g.Parent[gvm_type.FuncReturnName(g, G.Target)] = k
+	rName := gvm_type.FuncReturnName(g, G.Target)
+	if len(rName) == 0 {
+		return fmt.Errorf("rName not found")
+	}
+	g.Parent[rName] = k
 	g.PC++
 	return nil
 }

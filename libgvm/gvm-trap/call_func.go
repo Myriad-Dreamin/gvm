@@ -40,7 +40,7 @@ func (c CallFunc) DoTrap(g *abstraction.ExecCtx) (err error) {
 	g.This["gvm_fp_cnt"] = gvm_type.Uint64(len(c.Right))
 
 	for l := range c.Left {
-		g.This[gvm_type.FuncReturnName(g, l)] = gvm_type.String(c.Left[l])
+		gvm_type.SetReturnField(g, l, c.Left[l])
 	}
 	g.This["gvm_fr_cnt"] = gvm_type.Uint64(len(c.Left))
 	return
