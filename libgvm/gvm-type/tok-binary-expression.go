@@ -1,7 +1,6 @@
 package gvm_type
 
 import (
-	"fmt"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
 )
 
@@ -29,34 +28,12 @@ func (b BinaryExpression) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) 
 	if err != nil {
 		return nil, err
 	}
-	switch b.Sign {
-	case SignEQ:
-		return EQ(l, r)
-	case SignNEQ:
-		return NEQ(l, r)
-	case SignLE:
-		return LE(l, r)
-	case SignLT:
-		return LT(l, r)
-	case SignGE:
-		return GE(l, r)
-	case SignGT:
-		return GT(l, r)
-	case SignLAnd:
-		return LAnd(l, r)
-	case SignLOr:
-		return LOr(l, r)
-	case SignAdd:
-		return Add(l, r)
-	case SignSub:
-		return Sub(l, r)
-	case SignMul:
-		return Mul(l, r)
-	case SignQuo:
-		return Quo(l, r)
-	case SignRem:
-		return Rem(l, r)
-	default:
-		return nil, fmt.Errorf("unknown sign_type: %v", b.Sign)
+	l, err = BiCalc(l, r, b.Sign)
+	if err != nil {
+		return nil, err
 	}
+	if l.GetGVMType() != b.Type {
+		return nil, expressionTypeError(b.Type, l.GetGVMType())
+	}
+	return l, nil
 }

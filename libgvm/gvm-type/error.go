@@ -17,3 +17,6 @@ func invalidTypeError(k abstraction.Ref) error {
 	return fmt.Errorf("invalid type: %v", ExplainGVMType(k.GetGVMType()))
 }
 
+func expressionTypeError(want abstraction.RefType, got abstraction.RefType) error {
+	return fmt.Errorf("expression want type %s, got %s", ExplainGVMType(want), ExplainGVMType(got))
+}
