@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestFuncParam_Eval(t *testing.T) {
+func TestFuncReturnParam_Eval(t *testing.T) {
 	type fields struct {
 		T abstraction.RefType
 		K int
@@ -16,10 +16,12 @@ func TestFuncParam_Eval(t *testing.T) {
 	}
 
 	funcCtx := &abstraction.ExecCtx{
-		This: make(abstraction.Locals),
+		Parent: make(abstraction.Locals),
+		This:   make(abstraction.Locals),
 	}
 
-	AddParam(funcCtx, 0, Uint64(1))
+	SetReturnField(funcCtx, 0, "a")
+	funcCtx.Parent["a"] = Uint64(1)
 
 	tests := []struct {
 		name    string
@@ -29,14 +31,14 @@ func TestFuncParam_Eval(t *testing.T) {
 		wantErr bool
 		err     error
 	}{
-		{name: "getFuncCtx-param0", fields: fields{T: RefUint64, K: 0}, args: args{funcCtx}, want: Uint64(1)},
-		{name: "getFuncCtx-param0-type-error", fields: fields{T: RefInt64, K: 0},
+		{name: "getFuncCtx-return0", fields: fields{T: RefUint64, K: 0}, args: args{funcCtx}, want: Uint64(1)},
+		{name: "getFuncCtx-return0-type-error", fields: fields{T: RefInt64, K: 0},
 			args: args{funcCtx}, wantErr: true, err: expressionTypeError(RefInt64, RefUint64)},
-		{name: "getFuncCtx-param2", fields: fields{T: RefUnknown, K: 2}, args: args{funcCtx}, want: Undefined},
+		{name: "getFuncCtx-return2", fields: fields{T: RefUnknown, K: 2}, args: args{funcCtx}, want: Undefined},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			f := FuncParam{
+			f := FuncReturnParam{
 				T: tt.fields.T,
 				K: tt.fields.K,
 			}

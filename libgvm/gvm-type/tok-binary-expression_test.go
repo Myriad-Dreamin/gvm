@@ -22,8 +22,17 @@ func TestBinaryExpression_Eval(t *testing.T) {
 		args    args
 		want    abstraction.Ref
 		wantErr bool
+		err     error
 	}{
-		// TODO: Add test cases.
+		{name: "add", fields: fields{Type: RefUint64, Sign: SignAdd, Left: Uint64(1), Right: Uint64(2)}, args: args{
+			nil,
+		}, want: Uint64(3)},
+		{name: "sub", fields: fields{Type: RefUint64, Sign: SignSub, Left: Uint64(2), Right: Uint64(1)}, args: args{
+			nil,
+		}, want: Uint64(1)},
+		{name: "type error", fields: fields{Type: RefInt64, Sign: SignSub, Left: Uint64(2), Right: Uint64(1)}, args: args{
+			nil,
+		}, want: Uint64(1), wantErr: true, err: expressionTypeError(RefInt64, RefUint64)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -36,6 +45,11 @@ func TestBinaryExpression_Eval(t *testing.T) {
 			got, err := b.Eval(tt.args.g)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			} else if err != nil {
+				if tt.err.Error() != err.Error() {
+					t.Errorf("Eval.err = %v, want = %v", err.Error(), tt.err.Error())
+				}
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {

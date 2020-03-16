@@ -22,7 +22,10 @@ func TestUnaryExpression_Eval(t *testing.T) {
 		want    abstraction.Ref
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{name: "got", fields: fields{Sign: SignLNot, Type: RefBool, Left: Bool(true)},
+			args: args{&abstraction.ExecCtx{}}, want: Bool(false)},
+		{name: "got", fields: fields{Sign: SignLNot, Type: RefBool, Left: Bool(false)},
+			args: args{&abstraction.ExecCtx{}}, want: Bool(true)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

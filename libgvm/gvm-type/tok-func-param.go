@@ -19,21 +19,27 @@ func (f FuncParam) GetGVMType() abstraction.RefType {
 }
 
 func (f FuncParam) Eval(g *abstraction.ExecCtx) (abstraction.Ref, error) {
-	return GetParam(g, f.K), nil
+	l := GetParam(g, f.K)
+
+	if l.GetGVMType() != f.T {
+		return nil, expressionTypeError(f.T, l.GetGVMType())
+	}
+
+	return l, nil
 }
 
 func GetParam(g *abstraction.ExecCtx, k int) abstraction.Ref {
-	return g.This[FuncParamName(k)]
+	l, ok := g.This[FuncParamName(k)]
+	if !ok {
+		return Undefined
+	}
+	return l
+}
+
+func AddParam(g *abstraction.ExecCtx, k int, r abstraction.Ref) {
+	g.This[FuncParamName(k)] = r
 }
 
 func FuncParamName(k int) string {
 	return strconv.Itoa(k)
-}
-
-func FuncReturnName(g *abstraction.ExecCtx, k int) string {
-	return g.This["_gvm_return"+strconv.Itoa(k)].Unwrap().(string)
-}
-
-func GetReturn(g *abstraction.ExecCtx, k int) abstraction.Ref {
-	return g.Parent[FuncReturnName(g, k)]
 }

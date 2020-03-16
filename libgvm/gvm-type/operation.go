@@ -1,6 +1,7 @@
 package gvm_type
 
 import (
+	"fmt"
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
 	"github.com/Myriad-Dreamin/gvm/libgvm/gvm-builtin"
 )
@@ -12,6 +13,39 @@ func arithmeticCal(protoCal func(interface{}, interface{}) interface{}, l abstra
 		return nil, err
 	}
 	return UnsafeShrinkType(protoCal(ExtendType(l), ExtendType(r)), l.GetGVMType())
+}
+
+func BiCalc(l, r abstraction.Ref, s SignType) (abstraction.Ref, error) {
+	switch s {
+	case SignEQ:
+		return EQ(l, r)
+	case SignNEQ:
+		return NEQ(l, r)
+	case SignLE:
+		return LE(l, r)
+	case SignLT:
+		return LT(l, r)
+	case SignGE:
+		return GE(l, r)
+	case SignGT:
+		return GT(l, r)
+	case SignLAnd:
+		return LAnd(l, r)
+	case SignLOr:
+		return LOr(l, r)
+	case SignAdd:
+		return Add(l, r)
+	case SignSub:
+		return Sub(l, r)
+	case SignMul:
+		return Mul(l, r)
+	case SignQuo:
+		return Quo(l, r)
+	case SignRem:
+		return Rem(l, r)
+	default:
+		return nil, fmt.Errorf("unknown sign_type: %v", s)
+	}
 }
 
 // Add implements arithmetical addition

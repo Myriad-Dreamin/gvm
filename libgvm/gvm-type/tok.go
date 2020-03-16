@@ -13,5 +13,6 @@ const (
 	TokUnaryExpression
 
 	TokFuncParam
+	TokReturnParam
 	TokLocalVariable
 )
