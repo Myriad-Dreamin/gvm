@@ -22,6 +22,14 @@ func (c CallFunc) Exec(g *abstraction.ExecCtx) error {
 	return c
 }
 
+func SetFuncParamCount(g *abstraction.ExecCtx, cnt uint64) {
+	g.This["gvm_fp_cnt"] = gvm_type.Uint64(cnt)
+}
+
+func SetReturnParamCount(g *abstraction.ExecCtx, cnt uint64) {
+	g.This["gvm_fr_cnt"] = gvm_type.Uint64(cnt)
+}
+
 func (c CallFunc) DoTrap(g *abstraction.ExecCtx) (err error) {
 	var refs = make([]abstraction.Ref, len(c.Right))
 	for l := range c.Right {
@@ -35,13 +43,13 @@ func (c CallFunc) DoTrap(g *abstraction.ExecCtx) (err error) {
 		return err
 	}
 	for l := range c.Right {
-		gvm_type.AddParam(g, l, refs[l])
+		gvm_type.AddFuncParam(g, l, refs[l])
 	}
-	g.This["gvm_fp_cnt"] = gvm_type.Uint64(len(c.Right))
+	SetFuncParamCount(g, uint64(len(c.Right)))
 
 	for l := range c.Left {
 		gvm_type.SetReturnField(g, l, c.Left[l])
 	}
-	g.This["gvm_fr_cnt"] = gvm_type.Uint64(len(c.Left))
+	SetReturnParamCount(g, uint64(len(c.Left)))
 	return
 }
