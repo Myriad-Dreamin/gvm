@@ -36,7 +36,7 @@ func GetParam(g *abstraction.ExecCtx, k int) abstraction.Ref {
 	return l
 }
 
-func AddParam(g *abstraction.ExecCtx, k int, r abstraction.Ref) {
+func AddFuncParam(g *abstraction.ExecCtx, k int, r abstraction.Ref) {
 	g.This[FuncParamName(k)] = r
 }
 

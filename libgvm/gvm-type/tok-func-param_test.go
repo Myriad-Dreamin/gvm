@@ -19,7 +19,7 @@ func TestFuncParam_Eval(t *testing.T) {
 		This: make(abstraction.Locals),
 	}
 
-	AddParam(funcCtx, 0, Uint64(1))
+	AddFuncParam(funcCtx, 0, Uint64(1))
 
 	tests := []struct {
 		name    string
