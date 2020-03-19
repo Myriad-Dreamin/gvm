@@ -1,4 +1,4 @@
-package libgvm_test
+package test
 
 import (
 	"fmt"
@@ -10,29 +10,7 @@ import (
 	"github.com/Myriad-Dreamin/minimum-lib/sugar"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"time"
 )
-
-type doInst struct {
-	g func(g *abstraction.ExecCtx) error
-}
-
-func (d doInst) Exec(g *abstraction.ExecCtx) error {
-	return d.g(g)
-}
-
-func runMemoryGVM(callback func(g *libgvm.GVMeX), instructions []abstraction.Instruction) {
-	g := sugar.HandlerError(libgvm.NewGVM()).(*libgvm.GVMeX)
-	sugar.HandlerError0(g.AddFunction("main", instructions))
-	sugar.HandlerError0(g.AddFunction("setA", funcSetA()))
-	sugar.HandlerError0(g.AddFunction("fib", funcFib()))
-	var err error
-	for err = g.Run("main"); err == nil; {
-		err = g.Run("main")
-		time.Sleep(time.Second)
-	}
-	callback(g)
-}
 
 func setStateTestCase() []abstraction.Instruction {
 	return []abstraction.Instruction{
@@ -183,7 +161,7 @@ func funcFib() []gvm.Instruction {
 		},
 		// r = n + q; return r
 		gvm_instruction.SetFuncReturn{Target: 0, RightExpression: gvm_type.BinaryExpression{
-			Type: gvm_type.RefInt64, Sign: gvm_type.SignAdd, Left: gvm_type.LocalVariable{Name: "q"}, Right: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0},
+			Type: gvm_type.RefInt64, Sign: gvm_type.SignAdd, Left: gvm_type.LocalVariable{Name: "q", Type: gvm_type.RefInt64}, Right: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0},
 		}},
 	}
 }
@@ -193,9 +171,9 @@ func TestFibonacci(t *testing.T) {
 	runMemoryGVM(func(g *libgvm.GVMeX) {
 		//fmt.Println(g.Machine.(*libgvm.Mem).Context)
 	}, []abstraction.Instruction{
-		gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{gvm_type.Int64(3)}},
+		gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{gvm_type.Int64(4)}},
 		doInst{g: func(g *abstraction.ExecCtx) error {
-			fmt.Println("fib(3) =", g.This["res"])
+			fmt.Println("fib(4) =", g.This["res"])
 			g.PC++
 			return nil
 		}},
