@@ -20,7 +20,7 @@ func saveFrame(g *abstraction.ExecCtx) error {
 	return nil
 }
 
-func loadFrame(g *abstraction.ExecCtx) (err error) {
+func _loadFrame(g *abstraction.ExecCtx) (err error) {
 	g.FN, err = GetFN(g, g.Depth)
 	if err != nil {
 		return err
@@ -29,7 +29,6 @@ func loadFrame(g *abstraction.ExecCtx) (err error) {
 	if err != nil {
 		return err
 	}
-	g.This = g.Parent
 	if g.Depth > 0 {
 		g.Parent, err = loadLocals(g, g.Depth-1)
 		if err != nil {
@@ -43,6 +42,23 @@ func loadFrame(g *abstraction.ExecCtx) (err error) {
 		return err
 	}
 	return nil
+}
+
+func loadFrameFromDisk(g *abstraction.ExecCtx) (err error) {
+	g.Depth, err = GetCurrentDepth(g)
+	if err != nil {
+		return err
+	}
+	g.This, err = loadLocals(g, g.Depth)
+	if err != nil {
+		return err
+	}
+	return _loadFrame(g)
+}
+
+func reloadFrame(g *abstraction.ExecCtx) (err error) {
+	g.This = g.Parent
+	return _loadFrame(g)
 }
 
 func deleteFrame(g *abstraction.ExecCtx) error {
@@ -85,10 +101,12 @@ func popFrame(g *abstraction.ExecCtx) (err error) {
 	}
 
 	g.Depth--
-	err = loadFrame(g)
-	if err != nil {
-		return err
+	if g.Depth > 0 {
+		err = reloadFrame(g)
+		if err != nil {
+			return err
+		}
+		return setCurrentState(g)
 	}
-
-	return setCurrentState(g)
+	return StopUnderFlow
 }

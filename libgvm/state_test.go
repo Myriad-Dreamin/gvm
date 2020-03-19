@@ -21,17 +21,28 @@ func Test_pushPop(t *testing.T) {
 	sugar.HandlerError0(g2.AddFunction("main", []abstraction.Instruction{gotoImpl{}}))
 	sugar.HandlerError0(g2.AddFunction(newFn, nil))
 	sugar.HandlerError0(g2.AddFunction(newFn2, []abstraction.Instruction{gotoImpl{}, gotoImpl{}}))
-
+	gCtx := &abstraction.ExecCtx{
+		Machine:  g,
+		Function: sugar.HandlerError(g.GetFunction("main")).(abstraction.Function),
+		PC:       1,
+		Depth:    1,
+		FN:       "main",
+		Parent:   abstraction.Locals{},
+		This:     abstraction.Locals{"a": gvm_type.Bool(true)},
+	}
 	g2Ctx := &abstraction.ExecCtx{
 		Machine:  g2,
 		Function: sugar.HandlerError(g.GetFunction("main")).(abstraction.Function),
 		PC:       1,
-		Depth:    0,
+		Depth:    1,
 		FN:       "main",
-		Parent:   nil,
+		Parent:   abstraction.Locals{"b": gvm_type.Bool(true)},
 		This:     abstraction.Locals{"a": gvm_type.Bool(true)}}
 	sugar.HandlerError0(PushFrame(g2Ctx, newFn))
-
+	sugar.HandlerError0(saveLocals(gCtx, 0, gCtx.Parent))
+	sugar.HandlerError0(saveLocals(g2Ctx, 0, g2Ctx.Parent))
+	sugar.HandlerError0(saveFrame(gCtx))
+	sugar.HandlerError0(saveFrame(g2Ctx))
 	type args struct {
 		g  *abstraction.ExecCtx
 		fn string
@@ -41,15 +52,7 @@ func Test_pushPop(t *testing.T) {
 		args args
 		f    abstraction.Function
 	}{
-		{name: "pushPop", args: args{g: &abstraction.ExecCtx{
-			Machine:  g,
-			Function: sugar.HandlerError(g.GetFunction("main")).(abstraction.Function),
-			PC:       1,
-			Depth:    0,
-			FN:       "main",
-			Parent:   nil,
-			This:     abstraction.Locals{"a": gvm_type.Bool(true)},
-		}, fn: newFn}, f: sugar.HandlerError(g.GetFunction(newFn)).(abstraction.Function)},
+		{name: "pushPop", args: args{g: gCtx, fn: newFn}, f: sugar.HandlerError(g.GetFunction(newFn)).(abstraction.Function)},
 		{name: "pushPopWithDepth0", args: args{g: g2Ctx, fn: newFn2},
 			f: sugar.HandlerError(g.GetFunction(newFn2)).(abstraction.Function)},
 	}
@@ -78,7 +81,7 @@ func Test_pushPop(t *testing.T) {
 			if !assert.EqualValues(t, tt.args.fn, tt.args.g.FN) {
 				t.Errorf("want = %v, got = %v", tt.args.fn, tt.args.g.FN)
 			}
-			if err := popFrame(tt.args.g); err != nil {
+			if err := popFrame(tt.args.g); err != nil && err != StopUnderFlow {
 				t.Fatal(err)
 			}
 			if !assert.EqualValues(t, d, tt.args.g.Depth) {

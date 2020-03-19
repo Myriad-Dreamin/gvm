@@ -19,7 +19,7 @@ func TestLocalVariable_Eval(t *testing.T) {
 		This: make(abstraction.Locals),
 	}
 
-	ctx.This["b"] = Bool(true)
+	ctx.This["a"] = Bool(true)
 
 	tests := []struct {
 		name    string

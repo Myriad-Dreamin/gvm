@@ -2,17 +2,12 @@ package libgvm
 
 import (
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
-	"github.com/Myriad-Dreamin/minimum-lib/sugar"
 )
 
 func Step(g abstraction.Machine) error {
 
-	d, err := GetCurrentDepth(g)
-	if err != nil {
-		return err
-	}
-	c := abstraction.ExecCtx{Machine: g, Depth: d}
-	if err = loadFrame(&c); err != nil {
+	c := abstraction.ExecCtx{Machine: g}
+	if err := loadFrameFromDisk(&c); err != nil {
 		return err
 	}
 
@@ -20,12 +15,8 @@ func Step(g abstraction.Machine) error {
 }
 
 func Continue(g abstraction.Machine) error {
-	d, err := GetCurrentDepth(g)
-	if err != nil {
-		return err
-	}
-	c := abstraction.ExecCtx{Machine: g, Depth: d}
-	if err = loadFrame(&c); err != nil {
+	c := abstraction.ExecCtx{Machine: g}
+	if err := loadFrameFromDisk(&c); err != nil {
 		return err
 	}
 
@@ -40,7 +31,7 @@ func _Continue(g *abstraction.ExecCtx) (err error) {
 }
 
 //trapCallFunc
-func Run(g abstraction.Machine, fn string) (err error) {
+func Run(g abstraction.Machine, fn string, reportSaveError func(err error)) (err error) {
 
 	var c = &abstraction.ExecCtx{Machine: g, Depth: 0, This: make(abstraction.Locals)}
 	err = PushFrame(c, fn)
@@ -54,7 +45,7 @@ func Run(g abstraction.Machine, fn string) (err error) {
 		}
 	}
 	if err != StopUnderFlow {
-		sugar.HandlerError0(saveFrame(c))
+		reportSaveError(saveFrame(c))
 	}
 	return err
 }

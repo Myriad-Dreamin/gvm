@@ -2,6 +2,7 @@ package libgvm
 
 import (
 	"github.com/Myriad-Dreamin/gvm/internal/abstraction"
+	"github.com/Myriad-Dreamin/minimum-lib/sugar"
 )
 
 type GVM struct {
@@ -17,5 +18,9 @@ func (i *GVM) Step() error {
 }
 
 func (i *GVM) Run(fn string) error {
-	return Run(i.Machine, fn)
+	return Run(i.Machine, fn, sugar.HandlerError0)
+}
+
+func (i *GVM) RunWithHandle(fn string, reportSaveError func(err error)) error {
+	return Run(i.Machine, fn, reportSaveError)
 }
