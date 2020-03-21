@@ -9,10 +9,11 @@ type (
 	Ref  = abstraction.Ref
 	VTok = abstraction.VTok
 
+	Instruction = abstraction.Instruction
 	Function    = abstraction.Function
 	ExecCtx     = abstraction.ExecCtx
 	Machine     = abstraction.Machine
-	Trap = abstraction.Trap
+	Trap        = abstraction.Trap
 
 	Locals abstraction.Locals
 )
