@@ -143,15 +143,16 @@ func TestBase(t *testing.T) {
 	})
 }
 
-func funcFib() []gvm.Instruction {
-	// func fib(n int64) (r int64)
+//noinspection GoUnusedFunction
+func funcAcc() []gvm.Instruction {
+	// func acc(n int64) (r int64)
 	return []gvm.Instruction{
 		// q := 0
 		gvm_instruction.SetLocal{Target: "q", RightExpression: gvm_type.Int64(0)},
-		// if n > 0 { q = fib(n - 1); }
+		// if n > 0 { q = acc(n - 1); }
 		gvm_instruction.ConditionCallFunc{
 			CallFunc: gvm_instruction.CallFunc{
-				FN: "fib", Left: []string{"q"}, Right: []gvm.VTok{gvm_type.BinaryExpression{
+				FN: "acc", Left: []string{"q"}, Right: []gvm.VTok{gvm_type.BinaryExpression{
 					Type: gvm_type.RefInt64, Sign: gvm_type.SignSub, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
 				}},
 			},
@@ -166,14 +167,70 @@ func funcFib() []gvm.Instruction {
 	}
 }
 
+func funcFib() []gvm.Instruction {
+	// func fac(n int64, a int64, b int64) (r int64)
+	return []gvm.Instruction{
+		// q := 0
+		gvm_instruction.SetLocal{Target: "q", RightExpression: gvm_type.Int64(0)},
+		// if n == 0 { q = a; }
+		&gvm_instruction.ConditionSetLocal{
+			SetLocal: gvm_instruction.SetLocal{
+				Target:          "q",
+				RightExpression: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 1},
+			},
+			Condition: gvm_type.BinaryExpression{
+				Type: gvm_type.RefBool, Sign: gvm_type.SignEQ, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(0),
+			},
+		},
+		// if n == 1 { q = b; }
+		&gvm_instruction.ConditionSetLocal{
+			SetLocal: gvm_instruction.SetLocal{
+				Target:          "q",
+				RightExpression: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 2},
+			},
+			Condition: gvm_type.BinaryExpression{
+				Type: gvm_type.RefBool, Sign: gvm_type.SignEQ, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
+			},
+		},
+		// if n > 1 { q = fac(n - 1, b, a+b); }
+		gvm_instruction.ConditionCallFunc{
+			CallFunc: gvm_instruction.CallFunc{
+				FN: "fib", Left: []string{"q"}, Right: []gvm.VTok{
+					gvm_type.BinaryExpression{
+						Type: gvm_type.RefInt64, Sign: gvm_type.SignSub, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
+					},
+					gvm_type.FuncParam{T: gvm_type.RefInt64, K: 2},
+					gvm_type.BinaryExpression{
+						Type: gvm_type.RefInt64, Sign: gvm_type.SignAdd,
+						Left:  gvm_type.FuncParam{T: gvm_type.RefInt64, K: 1},
+						Right: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 2},
+					},
+				},
+			},
+			Condition: gvm_type.BinaryExpression{
+				Type: gvm_type.RefBool, Sign: gvm_type.SignGT, Left: gvm_type.FuncParam{T: gvm_type.RefInt64, K: 0}, Right: gvm_type.Int64(1),
+			},
+		},
+		// r = q; return r
+		gvm_instruction.SetFuncReturn{Target: 0,
+			RightExpression: gvm_type.LocalVariable{Name: "q", Type: gvm_type.RefInt64}},
+	}
+}
+
 //noinspection SpellCheckingInspection
 func TestFibonacci(t *testing.T) {
+	var n = 35
+
 	runMemoryGVM(func(g *libgvm.GVMeX) {
 		//fmt.Println(g.Machine.(*libgvm.Mem).Context)
 	}, []abstraction.Instruction{
-		gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{gvm_type.Int64(4)}},
+		gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{
+			gvm_type.Int64(n),
+			gvm_type.Int64(0),
+			gvm_type.Int64(1),
+		}},
 		doInst{g: func(g *abstraction.ExecCtx) error {
-			fmt.Println("fib(4) =", g.This["res"])
+			fmt.Printf("fib(%v) = %v\n", n, g.This["res"])
 			g.PC++
 			return nil
 		}},
@@ -181,12 +238,45 @@ func TestFibonacci(t *testing.T) {
 }
 
 //noinspection SpellCheckingInspection
-func BenchmarkFibnacci(b *testing.B) {
+func BenchmarkFibnacciTail35(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		runMemoryGVM(func(g *libgvm.GVMeX) {
 		}, []abstraction.Instruction{
-			gvm_instruction.CallFunc{FN: "fib", Left: []string{"res"}, Right: []abstraction.VTok{
-				gvm_type.Int64(3)}},
+			gvm_instruction.CallFunc{
+				FN:   "fib",
+				Left: []string{"res"},
+				Right: []abstraction.VTok{
+					gvm_type.Int64(35),
+					gvm_type.Int64(0),
+					gvm_type.Int64(1),
+				}},
+			//doInst{g: func(g *abstraction.ExecCtx) error {
+			//	if g.This["res"].Unwrap().(int64) != 9227465 {
+			//		panic(g.This["res"].Unwrap())
+			//	}
+			//	g.PC++
+			//	return nil
+			//}},
 		})
+	}
+}
+
+func fib(n, a, b int) int {
+	if n == 0 {
+		return a
+	} else if n == 1 {
+		return b
+	} else {
+		return fib(n-1, b, a+b)
+	}
+}
+
+//noinspection SpellCheckingInspection
+func BenchmarkFibnacciTail35Native(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		res := fib(35, 0, 1)
+		if res != 9227465 {
+			panic(res)
+		}
 	}
 }

@@ -10,7 +10,7 @@ type GVM struct {
 }
 
 func (i *GVM) Continue() error {
-	return Continue(i.Machine)
+	return Continue(i.Machine, sugar.HandlerError0)
 }
 
 func (i *GVM) Step() error {

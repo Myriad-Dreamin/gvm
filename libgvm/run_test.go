@@ -67,6 +67,6 @@ func BenchmarkContinue(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c0 := *c
-		_ = _Continue(&c0)
+		_ = _Continue(&c0, nil, sugar.HandlerError0)
 	}
 }
